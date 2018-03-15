@@ -1,0 +1,2713 @@
+
+<!-- sh_sub-added -->
+{% include 'sh_sub-cart-snippet' %}
+<!-- /sh_sub-added -->
+<!-- /templates/cart.liquid -->
+<script crossorigin="anonymous" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" src="https://code.jquery.com/jquery-3.1.1.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.4/js.cookie.js">
+</script>
+<script src="https://use.fontawesome.com/0082cf66af.js"></script>
+<script>
+  var delivery_fee = 14.99;
+  var free_delivery_threshold_dollars = 99.00;
+  var free_delivery_threshold_cents = free_delivery_threshold_dollars*100;
+  
+  {% for tag in customer.tags %}
+  console.log("{{tag}}");
+              {% endfor %}
+</script>
+
+
+{% comment %}
+
+For info on test orders:
+- General http://docs.shopify.com/manual/your-store/orders/test-orders
+- Shopify Payments - http://docs.shopify.com/manual/more/shopify-payments/testing-shopify-payments
+
+{% endcomment %}
+
+
+
+<style>
+/*   #your-shopping-cart.all-ship #pickup-delivery-inputs-container{
+   display:none; 
+  } */
+  
+  
+  .no-display{
+    display:none !important;
+  }
+  
+  .align-left{
+    text-align: left !important; 
+  }
+
+  .section-b{
+/*     display:none; */
+  }
+
+  div.cart-section.section-a{
+/*     border-top: 1px solid #1c1d1d; */
+  }
+  div.cart-section{
+    padding-top: 30px;
+    text-align: right;
+    padding-bottom: 30px;
+  }
+  #cart-summary-table-div{
+    padding-top: 0;
+    max-width: 100vw;
+    /*width: 50%*/
+  }
+  #cart-summary-table tr:first-child th:after, tr:first-child td:after{
+    border-bottom: none; 
+  }
+  #cart-summary-table tr > td:nth-child(3){
+    text-align: center; 
+    padding-right: 0;
+  }
+  #cart-summary-table tr > td:nth-child(4){
+    text-align: right; 
+    padding-left: 0;
+  }
+  #cart-summary-table tfoot > tr > td:nth-child(1){
+    text-align: right;
+    text-decoration: italic;
+    text-transform: lowercase;
+  }
+  #cart-summary-table tfoot > tr > td:nth-child(4){
+    border-top: 1px solid #1c1d1d;
+    border-bottom: 3px double #1c1d1d;
+    text-align: right; 
+  }
+  #cart-summary-table td{
+    padding-top: 0;
+    padding-bottom: 0; 
+    font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  #cart-summary-table > thead > tr > td{
+    border-bottom: 1px solid #1c1d1d;
+    font-weight: 600;
+  }
+  a.popup-open{
+    text-decoration: underline; 
+    cursor: pointer;
+  }
+
+
+
+  div.popup-container-bg{
+    position: fixed;
+    z-index: 10000;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    top: 0;
+    left: 0;
+  }
+
+  div.popup-container{
+    position: fixed;
+    z-index: 10001;
+    background-color: rgba(255,255,255,1);
+    border-top: 8px solid #a26b25;
+    border-radius: 0px 0px 5px 5px;
+    max-height: 95%;
+    overflow-y: auto;
+  }
+  div.popup-container > table{
+    background-color: transparent; 
+    margin-bottom: 5px;
+  }
+  div.popup-container > table td.theader{
+    font-weight: bold;	
+  }
+  div.popup-container > table tr{
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  div.popup-container > table td{
+    margin-top: 1px;
+    margin-bottom: 1px;
+    text-align: center;
+    font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: none !important;
+  }
+  div.popup-container > table td:after{
+    border-bottom: none;
+  }
+  div.popup-container > table tr{
+    border-bottom: 1px solid #eee;
+  }
+  div.popup-container > table td.available > span{
+    padding: 5px;
+    border-radius: 3px;
+    background-color: #00C851;
+    color: #fff;
+  }
+
+  @media (min-width: 1025px) {
+    .small{
+      display: none;
+    }
+    div.popup-container{
+      padding: 0px;
+      padding-bottom: 5px;
+      width: 50%;
+      min-height: 200px;
+      /*height: 50%;*/
+      top: 25%;
+      left: 25%;
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      max-height: 90%;
+      overflow-y: auto;
+    }
+    tr.wide.main-head{
+      color: #fff;
+      margin-top: -5px;
+    }
+    span.popup-close{
+      cursor:pointer;
+      float:right; 
+      font-weight: 400; 
+      color: #fff; 
+      font-size: 12px; 
+
+      padding: 4px; 
+      border-radius: 2px;
+      background-color: rgba(255,255,255,0.3);
+    }
+
+  }
+
+  @media (max-width: 1024px) {
+
+    .wide{
+      display: none;
+    }
+
+    div.popup-container{
+      padding: 5px;
+      width: 95%;
+      min-height: 200px;
+
+      left: 2.5%;
+      /*height: 50%;
+      top: 25%;
+      */
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+
+    }
+
+    a.popup-close{
+      position: fixed:
+        top: 0;
+      width: 100%;
+
+      color: #fff;
+      /*
+      left: 2.5%;
+      float:right;
+      margin-top:-20px;
+      margin-right:-12px;
+      */
+      cursor:pointer;
+      color: #fff;
+      border: 1px solid black;
+      border-radius: 3px;
+      background: black;
+      text-align: center;
+      font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+      font-size: 12px;
+      font-style: normal;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+      font-weight: bold;
+      display: inline-block;
+      line-height: 0px;
+      padding: 21px 3px;  
+
+    }
+
+    .popup-close:before {
+      content: "CLOSE WINDOW";
+      /*
+      float: right;
+      margin-top: -4px;
+      */
+    }
+
+  }
+
+  #pickup-table{
+    font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  table#pickup-table td:after{
+    border-bottom: none;
+  }
+  #pickup-table tfoot > tr > td {
+    text-align: center;
+  }
+  #pickup-table tfoot > tr > td > #pickup-more-btn {
+    margin-bottom: 0px;
+  }
+  #pickup-table tr {
+    border-bottom: 1px solid #777777;
+  }
+  tr.pickup-row {
+    display:none;
+  }
+  #pickup-table tr.pickup-row:nth-child(-n+5){
+    display:table-row;
+  }
+  #pickup-table.show-10 tr.pickup-row:nth-child(-n+10){
+    display:table-row;
+  }
+  #pickup-table td {
+    padding-top: 6px; 
+    padding-bottom: 6px; 
+  }
+  td.when{
+    padding-right: 0px;
+    text-align: center;
+    vertical-align: top;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    width: 99px;
+
+  }
+
+  td.when > div.date{
+    font-weight: bold;
+    line-height: 1.5;
+  }
+
+  td.where {
+    min-width: 50%;
+    padding-left: 15px;
+    vertical-align: top;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-right: 0px;
+    text-align: left;
+  }
+  td.where > div.loc{
+    font-weight: bold;
+
+  }
+  
+  
+
+  
+</style>
+
+<div id="zip20-pop" class="popup-container-bg" style="display:none;">
+  <div class="popup-container">
+    <a class="small popup-close"></a>
+    <table>
+      <thead>
+        <tr class="small main-head" style="border-bottom-color: black;">
+          <td colspan=3 style="font-size: 14px; font-weight: bold; ">Delivery Options</td>
+        </tr>
+        <tr class="wide main-head" style="background-color: black;">
+          <td colspan=3 style="font-size: 14px; font-weight: bold; ">Delivery Options
+            <span class="popup-close" >Close</span>
+          </td>
+        </tr>
+        <tr style="border-bottom-color: black;">
+          <td class="theader">
+            <span class="wide">ZIP Code</span>
+            <span class="small">ZIP</span>
+          </td>
+          <td class="theader">
+            <span class="wide">Complimentary Delivery</span>
+            <span class="small">Complimentary</span>
+          </td>
+          <td class="theader">
+            <span class="wide">Available*</span>
+            <span class="small">Available*</span>
+          </td>
+        </tr>
+      </thead>
+      <tbody id="zip20-pop-table">
+      </tbody>
+    </table>
+  </div>  
+</div>  
+
+<div id="edit-cart-item-pop" class="popup-container-bg" style="display:none;">
+  <div class="popup-container edit-cart-item">
+    <div class="edit-cart-pop-info">
+      <div class="edit-cart-pop-img-container">
+        <a>
+          <img src="//cdn.shopify.com/s/files/1/1920/4589/products/IMG_7038_large.JPG?v=1501088291" alt="KC Cattle Co Hat - Vintage Charcoal">
+        </a>
+      </div>
+      <div class="edit-cart-pop-info-container">
+        <p class="edit-cart-title">
+        </p>
+        <p class="edit-cart-price-per dollar">
+        </p>
+        <div>
+          <div class="select-wrapper smaller-text">
+            <label>Qty</label>
+            <select orig-val=1 class="edit-cart-quantity">
+              <option value=1>1</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:none;">
+          <div class="select-wrapper smaller-text">
+            <label>Color</label>
+            <select orig-val="Vintage Charcoal" class="edit-cart-option">
+              <option value="Vintage Charcoal">Vintage Charcoal</option>
+              <option value="Jean Blue">Jean Blue</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <button class="cart-item-button" onclick="updateCart(this);" type="button">Update Cart</button>
+          <span id="msg"></span>
+        </div>
+      </div>
+    </div>
+  </div>  
+</div> 
+
+
+<script>
+  function updateCart(elm){
+    var key = $('.edit-cart-pop-info-container').attr('item-key');
+    var variant_id=key.split(':')[0];
+    var new_qty = $('.edit-cart-quantity').val();
+    console.log(variant_id);
+    console.log(new_qty);
+
+    jQuery.post('/cart/change.js', { quantity: new_qty, id: variant_id }, function (data){
+      var obj = JSON.parse(data);
+      console.log(obj['items']);
+      var items = obj['items'];
+      for(var i=0;i<items.length;i++){
+        if(items[i]['key']==key){
+          console.log('match');
+          var price = items[i]['price'];
+          var quantity = items[i]['quantity'];
+          $('.cart__row[item-key^="'+variant_id+'"]').attr('quantity',quantity);
+          var line_price = items[i]['line_price'];
+          $(document.getElementById('cart__price_'+key)).html('$'+parseFloat(Math.round(line_price) / 100).toFixed(2));
+          $('.cart__row[item-key^="'+variant_id+'"]').find('.qty-label').html(' '+quantity+' @ $'+ parseFloat(Math.round(price) / 100).toFixed(2));
+          $(elm).closest('div.popup-container-bg').trigger('click');
+        }
+      }
+    });
+    
+  }
+
+
+  
+  json_get_pickup_schedule();
+  json_get_delivery_schedule();
+  json_get_delivery_zips();
+
+  $("body").on('click', 'a.popup-close', function() {
+    $(this).parent().css('display','none');
+    $('body').css('overflow','');
+  });
+
+  $("body").on('click', 'div.popup-container-bg', function() {
+    $(this).css('display','none');
+    $('body').css('overflow','');
+  });
+
+  $('div.popup-container').click(function(event){
+    event.stopPropagation();
+  });
+  $('a.popup-close').click(function(event){
+    $(this).parent().parent().css('display','none');
+    $('body').css('overflow','');
+  }); 
+  $('span.popup-close').click(function(event){
+    $('a.popup-close').click();
+    //      $(this).parent().parent().css('display','none');
+    //     $('body').css('overflow','');
+  }); 
+  $("body").on('click', '.popup-open', function() {
+    $('body').css('overflow','hidden');
+    var pop_id = $(this).attr('pop');
+    $('#'+pop_id).css('display','');
+
+    var len = $('#zip20-pop-table').children().length;
+    if ( len == 0 ){
+      json_get_delivery_zips(); 
+    }
+    if ($(this).hasClass('cart-item-button')){
+      var img_url = $(this).closest('.cart__row').find('.cart__image > img').attr('src');
+      var img_alt = $(this).closest('.cart__row').find('.cart__image > img').attr('alt');
+      $('#edit-cart-item-pop').find('img').attr('src',img_url);
+      var title = $(this).closest('.cart__row').find('.cart__product-name').html();
+      $('#edit-cart-item-pop').find('.edit-cart-title').html(title);
+      
+      $( ".edit-cart-quantity > option" ).each(function( index ) {
+        $(this).remove();
+      });
+      var key = $(this).closest('.cart__row').attr('item-key');
+      $('.edit-cart-pop-info-container').attr('item-key',key);
+      var qty = $(this).closest('.cart__row').attr('quantity');
+      $('.edit-cart-quantity').attr('quantity',qty);
+      var price_per = $(this).closest('.cart__row').attr('price');
+      $('.edit-cart-pop-info-container').attr('price-per',price_per);
+      $('.edit-cart-pop-info-container').find('.edit-cart-price-per').html(price_per/100);
+      
+      
+      
+      var inv = $(this).closest('.cart__row').attr('inventory');
+      for(var i=0;i<=parseInt(inv);i++){
+       var opt = document.createElement('option');
+        if(i==qty){
+         $(opt).prop('selected',true); 
+        }
+        $(opt).attr('value',i);
+        $(opt).html(i);
+        $('.edit-cart-quantity').append(opt);
+      }      
+    }
+  });
+
+
+  $("body").on('change', '.edit-cart-quantity', function() {
+    var qty = $(this).val();
+    var price_per = $('.edit-cart-pop-info-container').attr('price-per');
+	var tot_line_price = (qty * price_per)/100;
+    console.log(tot_line_price);
+  });
+  
+  
+  function json_get_delivery_zips(){
+    $.getJSON(
+      //      "http://cors.io/spreadsheets.google.com/feeds/list/1o1u4NJi8PKjGKclEG2cMrctnSDT3lEcAt2N3WZeyCrk/od6/public/values?alt=json"
+      "https://spreadsheets.google.com/feeds/list/1o1u4NJi8PKjGKclEG2cMrctnSDT3lEcAt2N3WZeyCrk/od6/public/values?alt=json"
+      //      "https://spreadsheets.google.com/feeds/list/1o1u4NJi8PKjGKclEG2cMrctnSDT3lEcAt2N3WZeyCrk/od6/public/values?alt=json-in-script&callback=x"
+      , function(data) {
+
+        for ( var z = 0 ; z< data.feed.entry.length ; z++ ){
+          var zip = data.feed.entry[z]['gsx$zip']['$t'];
+          var free = data.feed.entry[z]['gsx$freedelivery']['$t'];
+          var fee = data.feed.entry[z]['gsx$onqualifyingordersonly']['$t'];
+          //          var incl = data.feed.entry[z]['gsx$freeonordersover200']['$t'];
+          //          console.log(zip + ' ' + free + ' ' + fee + ' ' );
+
+          var row = document.createElement("tr");
+          $(row).attr('id',zip);
+          $(row).attr('free',free);
+          $(row).attr('available',fee);
+          var td_zip = document.createElement("td");
+          $(td_zip).html(zip);
+
+          var td_free = document.createElement("td");
+          var span_free = document.createElement("span");
+          if ( free == 'TRUE' ){
+            $(span_free).html('Available');
+            $(td_free).attr('class','available');
+          }
+          else {
+            $(span_free).html('Not Available');
+            $(td_free).attr('class','not-available');
+          }
+          $(td_free).append(span_free);
+
+          var td_fee = document.createElement("td");
+          var span_fee = document.createElement("span");
+          if ( fee == 'TRUE' ){
+            $(span_fee).html('Available');
+            $(td_fee).attr('class','available');
+          }
+          else {
+            $(span_fee).html('Not Available');
+            $(td_fee).attr('class','not-available');
+          }
+          $(td_fee).append(span_fee);
+          $(row).append(td_zip);
+          $(row).append(td_free);
+          $(row).append(td_fee);
+          //          $(row).append(td_incl);
+          $('#zip20-pop-table').append(row);
+        }
+      }); 
+
+  }
+
+
+  function json_get_delivery_schedule(){
+
+    $.getJSON(
+      "https://spreadsheets.google.com/feeds/list/1JDMBR0pdhvoVMzLPdsnjatJGajeZOsHdblN5q0GTvb8/od6/public/values?alt=json"
+      , function(data) {
+        var delivery_sched_arr = [];
+        for ( var z = 0 ; z< data.feed.entry.length ; z++ ){
+          var date = data.feed.entry[z]['gsx$deliverydate']['$t'];
+          var wday = data.feed.entry[z]['gsx$day']['$t'];
+          var start_time = data.feed.entry[z]['gsx$timestart']['$t'];
+          var end_time = data.feed.entry[z]['gsx$timeend']['$t'];
+          var delivery_obj = {
+            date : date,
+            wday : wday,
+            start_time : start_time.replace(":00", ""),
+            end_time : end_time.replace(":00", ""),
+          }
+          delivery_sched_arr.push(delivery_obj);
+        }
+
+        build_delivery_options(delivery_sched_arr);
+      }); 
+
+  }  
+
+  function build_delivery_options(delivery_sched_arr){
+    for ( var d=0; d<delivery_sched_arr.length ; d++ ){
+      var obj = delivery_sched_arr[d];
+      var date = obj.date;
+      var wday = obj.wday;
+      var start_time = obj.start_time;
+      var end_time = obj.end_time;
+      /*start of old*/
+      var opt = document.createElement('option');
+      $(opt).val(date+' ('+start_time+'-'+end_time+')');
+      $(opt).html(wday+', '+date+' ('+start_time+'-'+end_time+')');
+      $('#deliv-date').append(opt);
+      /*end of old*/
+      /*start of new*/
+      var opt = document.createElement('option');
+      $(opt).val(date+' ('+start_time+'-'+end_time+')');
+      $(opt).html(wday+', '+date+' ('+start_time+'-'+end_time+')');
+      $('#delivery-date').append(opt);
+      /* end of new*/
+      var li = document.createElement('li');
+      var input = document.createElement('input');
+      $(input).attr('type','radio');
+      $(input).attr('id','delivery-day-'+d);
+      $(input).attr('name','selector');
+      var label = document.createElement('label');
+      $(label).attr('for','delivery-day-'+d);
+      $(label).html(wday+', '+date + ' ('+start_time+'-'+end_time+')');
+      var check = document.createElement('div');
+      $(check).attr('class','check');
+      $(li).append(input);
+      $(li).append(label);
+      $(li).append(check);
+      $('#delivery-date-ul').append(li);
+    }
+  }
+
+  function build_pickup_options(pickup_sched_arr){
+    for ( var d=0; d<pickup_sched_arr.length ; d++ ){
+      var obj = pickup_sched_arr[d];
+      var date = obj.date;
+      var wday = obj.wday;
+      var start_time = obj.start_time;
+      var end_time = obj.end_time;
+      var location = obj.location;
+      var notes = obj.notes;
+
+
+      var btn = document.createElement('button');
+      $(btn).prop('type','button');
+      $(btn).attr('value',date + ' - '+location);
+      $(btn).attr('date',date);
+      $(btn).attr('location',location);
+      $(btn).attr('class','btn btn-option full-width');
+      $(btn).html(wday+', '+date+' ('+start_time+'-'+end_time+')'+'<br><b>'+location+'</b>');
+      $('#pickup-option-group').append(btn);
+
+      var li = document.createElement('li');
+      var input = document.createElement('input');
+      $(input).attr('type','radio');
+      $(input).attr('id','pickup-day-'+d);
+      $(input).attr('name','selector');
+      var label = document.createElement('label');
+      $(label).attr('for','pickup-day-'+d);
+      if ( notes !== '' ){
+        notes = ' ['+notes+']';
+      }
+      $(label).html(wday+', '+date + ' ('+start_time+'-'+end_time+') '+location + notes);
+      var check = document.createElement('div');
+      $(check).attr('class','check');
+      $(li).append(input);
+      $(li).append(label);
+      $(li).append(check);
+      //       $(li).append(notes_div);
+      $('#pickup-date-ul').append(li);
+    }
+  }
+
+
+  function json_get_pickup_schedule(){
+    $.getJSON(
+      "https://spreadsheets.google.com/feeds/list/11QEZ5CfieZbknXfCr7vl65nuK1dya1yltM0pXxbD3Bo/od6/public/values?alt=json"
+      , function(data) {
+        var pickup_sched_arr = [];
+        var onoff = data.feed.entry[0]['gsx$onoroff']['$t'];
+        console.log('onoff: '+onoff);
+        if ( onoff == 'Turned off' ){
+          $('[method="pickup"]').css('display','none');
+
+          
+          $('#pickup-option').parent().css('display','none');
+          $('#home-delivery-btn').removeClass('one-third-width');
+          $('#home-delivery-btn').addClass('half-width');
+          $('#pick-up-btn').removeClass('one-third-width');
+          $('#pick-up-btn').addClass('half-width');
+          $('#pick-up-btn').css('display','none');
+          $('#other-arrange-btn').removeClass('one-third-width');
+          $('#other-arrange-btn').addClass('half-width');
+        }
+        if ( onoff == 'Turned on' ){
+          console.log('no pickup');
+          $('[method="pickup"]').css('display','inline-block');
+          for ( var z = 0 ; z< data.feed.entry.length ; z++ ){
+            var date = data.feed.entry[z]['gsx$pickupdate']['$t'];
+            var wday = data.feed.entry[z]['gsx$day']['$t'];
+            var start_time = data.feed.entry[z]['gsx$timestart']['$t'];
+            var end_time = data.feed.entry[z]['gsx$timeend']['$t'];
+            var location = data.feed.entry[z]['gsx$location']['$t'];
+            var address = data.feed.entry[z]['gsx$address']['$t'];        
+            var notes = data.feed.entry[z]['gsx$notes']['$t']; 
+            var pickup_obj = {
+              date : date,
+              wday : wday,
+              start_time : start_time.replace(":00", ""),
+              end_time : end_time.replace(":00", ""),
+              location : location,
+              address : address,
+              notes : notes
+            }
+            pickup_sched_arr.push(pickup_obj);
+          }
+          build_pickup_options(pickup_sched_arr);
+        }
+      }); 
+
+  }
+
+
+</script>    
+
+<style>
+  div.cart-row-hide{
+    display:none;
+  }
+  tr.cart-row-hide{
+  	display:none;
+  }
+  ul.no-mail-ul > li {
+    font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 1em;
+  }
+  #pickup-delivery-prompt-div{
+   padding-bottom: 10px; 
+  }
+  #pickup-delivery-options-div{
+   padding-top: 10px; 
+  }
+/*   span.cart-ship-note{
+    font-size: 0.8em;
+    color: #4264aa;
+    font-weight: 500 !important;
+  } */
+</style>
+
+
+
+<div class="grid">
+<!--   <div class="grid__item large--five-sixths push--large--one-twelfth"> -->
+  <div class="grid__item large--three-sixths push--large--one-twelfth">
+    {% if cart.item_count > 0 %}
+    <header class="section-header text-center" style="margin-bottom: 15px;">
+      <h1 class="text-center font-upper" style="margin-bottom: 5px;">{{ 'cart.general.title' | t }} ({{ cart.item_count }})</h1>
+      <hr class="hr--small" style="margin-top: 1px;">
+    </header>
+
+    <form action="/cart" method="post" novalidate class="cart">
+<!--       <div class="cart__row medium-down--hide cart__header-labels section-a">
+        <div class="grid--full">
+          <div class="grid__item large--two-fifths push--large--three-fifths">
+            <div class="grid--full">
+              <div class="grid__item two-thirds medium-down--half text-right">
+                {{ 'cart.label.total' | t }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      {% comment %}
+      Loop through products in the cart
+      {% endcomment %}
+      
+
+      <div class="cart-container">
+      {% for item in cart.items %}
+        {% comment %}
+        Check the quantity of the cart item against the available inventory, in the event the cart quantity is higher than the available inventory,
+        the cart quantity is updated to match the available inventory, and the page reloads
+        {% endcomment %}
+      <script>console.log('Quantity: {{ item.quantity }}')</script>
+      <script>console.log('Inventory: {{ item.variant.inventory_quantity }}')</script>
+      {% if item.variant.inventory_quantity > 0 %} 
+      {% if item.quantity > item.variant.inventory_quantity %} 
+      {% if item.variant.inventory_policy == 'deny' %}
+      <script>
+        jQuery.post('/cart/update.js', {updates: {
+          {{ item.variant.id }}: {{ item.variant.inventory_quantity }}  //delivery 20
+        }});
+        location.reload();
+      </script>
+      {% endif %}	
+      {% endif %}
+      {% endif %}
+      <div class="cart__row section-a{% if item.title contains 'Delivery' %} cart-row-hide {% else %} cart-row-show {% endif %}" item-key="{{ item.key }}" quantity={{item.quantity}} price={{item.variant.price %}} inventory={{item.variant.inventory_quantity %}}>
+        <div class="grid--full cart__row--table-large">
+          <div class="grid__item large--four-fifths">
+            <div class="grid">
+              <div class="grid__item one-fifth" style=""> <!-- one-third">-->
+                <a href="{{ item.url | within: collections.all }}" class="cart__image">
+                  {% comment %}
+                  More image size options at:
+                  - http://docs.shopify.com/themes/filters/product-img-url
+                  {% endcomment %}
+                  <img src="{{ item | img_url: 'large' }}" alt="{{ item.title | escape }}">
+                </a>
+              </div>
+              <div class="grid__item four-fifths">
+                <a href="{{ item.url }}" class="h4 cart__product-name">
+                  {{ item.product.title }}
+                </a>
+                <p class="cart__product-meta" style="font-size: 0.85em;">
+                  <b>Product #</b>:&nbsp;{{ item.id }}
+                </p>
+                {% unless item.variant.title contains 'Default' %}
+                {% assign selectedopts =  item.variant.title | split: " / " %}
+                {% for option in item.product.options_with_values %}
+                <p class="cart__product-meta" style="font-size: 0.85em;">
+                  <b>{{ option.name }}</b>:&nbsp;                 
+                  {% for value in option.values %}
+                  {% if selectedopts[0]  == value %} {{ selectedopts[0] }} {% endif %}
+                  {% if selectedopts[1]  == value %} {{ selectedopts[1] }} {% endif %}
+                  {% if selectedopts[2]  == value %} {{ selectedopts[2] }} {% endif %}
+                  {% if selectedopts[3]  == value %} {{ selectedopts[3] }} {% endif %}
+                  {% if selectedopts[4]  == value %} {{ selectedopts[4] }} {% endif %}
+                  {% if selectedopts[5]  == value %} {{ selectedopts[5] }} {% endif %}
+                  {% if selectedopts[6]  == value %} {{ selectedopts[6] }} {% endif %}
+                  {% if selectedopts[7]  == value %} {{ selectedopts[7] }} {% endif %}
+                  {% if selectedopts[8]  == value %} {{ selectedopts[8] }} {% endif %}
+                  {% if selectedopts[9]  == value %} {{ selectedopts[9] }} {% endif %}
+                  {% endfor %}
+                </p>
+                {% endfor %}
+                {% endunless %}
+                {% if item.quantity <= item.variant.inventory_quantity %} 
+                <p class="cart__product-meta" style="font-size: 0.85em;">
+                  <b>Qty</b>:<span class="qty-label">&nbsp;{{ item.quantity }}&nbsp;@&nbsp;{{ item.price | money }}</span>
+                </p>
+                {% endif %}
+                
+                
+                {% if item.requires_shipping %}
+                <p class="cart__product-meta">
+                  <b>How we'll get it to you:</b> USPS! You'll have shipping options on the next page.
+                </p>
+                {% endif %}
+                
+                
+                {% unless item.requires_shipping %}
+                <p class="cart__product-meta">
+                  <span class="cart-ship-note"><b>How we'll get it to you:</b> Farm to Doorstep! We'll bring it to you ourselves.</span>
+                </p>
+                {% endunless %}
+                {% if settings.product_vendor_enable %}
+                <p class="cart__product-meta">{{ item.vendor }}</p>
+                {% endif %}
+                <button class="cart-item-button popup-open" pop="edit-cart-item-pop" type="button">Edit</button>
+                <button class="cart-item-button">
+                  <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0">{{ 'cart.general.remove' | t }}</a>
+                </button>
+                {% assign property_size = item.properties | size %}
+                {% if property_size > 0 %}
+                {% for p in item.properties %}
+                {% assign first_character_in_key = p.first | truncate: 1, '' %}
+                {% unless p.last == blank or first_character_in_key == '_' %}
+                {{ p.first }}:
+                {% if p.last contains '/uploads/' %}
+                <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                {% else %}
+                {{ p.last }}
+                {% endif %}
+                <br>
+                {% endunless %}
+                {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="grid__item large--one-fifth">
+            <div class="grid--full cart__row--table">
+              <div class="grid__item grid--full text-right" style="padding-right: 15px;">
+                
+                {% if item.original_line_price != item.line_price %}
+                <small class="cart__price cart__price--strikethrough">{{ item.original_line_price | money }}</small>
+                {% endif %}
+                <span class="cart__price" id="cart__price_{{ item.key }}">{{ item.line_price | money }}</span>
+                {% assign discounts_size = item.discounts | size %}
+                {% if discounts_size > 0 %}
+                {% for discount in item.discounts %}
+                <small class="cart__discount">{{ discount.title }}</small>
+                {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+            <div class="grid--full cart__row--table">
+              <div class="grid__item one-third text-center">
+                <span id="inventory-max-message-{{ item.key }}" class="inventory-max-message font-upper" style="opacity:0; font-size: 0.8em;">Only {{item.variant.inventory_quantity}} in stock</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {% endfor %}
+      </div>
+      <script>
+
+        $("body").on('change', 'select.cart-quantity-select', function() {
+          var key = $(this).attr('item-key');
+          var variant_id=key.split(':')[0];
+          var new_qty = $(this).val();
+          console.log(variant_id);
+          console.log(new_qty);
+          
+          var cur_qty_disp = $(this).closest('.cart-row-show').find('.qty-label').html();
+          var cur_price = cur_qty_disp.split('@')[1];
+           $(this).closest('.cart-row-show').find('.qty-label').html(' '+new_qty+' @'+cur_price);
+
+          jQuery.post('/cart/change.js', { quantity: new_qty, id: variant_id }, function (data){
+            var obj = JSON.parse(data);
+            console.log(obj['items']);
+            var items = obj['items'];
+            for(var i=0;i<items.length;i++){
+              if(items[i]['key']==key){
+               	console.log('match');
+                var line_price = items[i]['line_price'];
+                line_price = '$'+(line_price/100);
+                console.log(line_price);
+//                 console.log( key.split(':')[0] + '\\\\' + ':' + key.split(':')[1] );
+//                 var keyid = key.split(':')[0] + '\\\\' + ':' + key.split(':')[1];
+//                 $('#cart__price_'+keyid).html(line_price);
+                $(document.getElementById('cart__price_'+key)).html(line_price);
+//                 $('#cart__price_40327045764\\:6ad721f63271b5117d7dfd5cf91509cd').html(line_price);
+              }
+            }
+          });
+
+
+                      });
+        {% comment %}
+
+        {% endcomment %}
+      </script>
+      
+      	<div id="cart-continue-btn-div" class="cart-section section-a" style="padding:0;">
+      		<button type="submit" id="update-cart-button" name="update" class="btn--secondary update-cart" style="display:none;">{{ 'cart.general.update' | t }}</button>
+      		<a id="cart-continue-btn" class="btn" class="ready" style="display:none;">Continue</a>
+      	</div>
+      
+      <script>
+        $("body").on('click', '#cart-continue-btn', function() {
+          cart_alerts();
+        });
+
+        $(document).ready(function() {
+          cart_alerts();
+          console.log('test');
+        });
+        
+        function cart_alerts(){
+
+//           $('.section-a').css('display','none');
+          $('#cart-summary-table-div').css('display','block');
+
+          var del_po_ship_item_arr = [];
+          $('tr.cart-summary-item').each(function( index ) {
+            var can_ship = $(this).attr('requires-shipping');
+            if ( can_ship == 'false' ){
+
+            }
+            console.log('can ship:'+ can_ship );
+          });
+
+          var delivery_pickup_count =  $('tr.cart-summary-item[requires-shipping="false"]').length;
+          var ship_count =  $('tr.cart-summary-item[requires-shipping="true"]').length;
+          var upcoming_pickup_sched_count =  $('tr.pickup-row').length;
+          console.log('delivery_pickup_count : ',delivery_pickup_count);
+          $('#hdelivery-count').val(delivery_pickup_count);
+          $('#shipping-count').val(ship_count);
+          console.log('ship_count : ',ship_count);
+          console.log('upcoming_pickup_sched_count : ',upcoming_pickup_sched_count);
+          var msg_base = ''
+
+          if ( delivery_pickup_count > 0 ){
+            $('div.section-b').css('display','block');
+            var msg_base = 'The following item cannot be shipped by mail. '
+            if (delivery_pickup_count > 1 ){
+              msg_base = 'The following items cannot be shipped by mail. '
+            }
+
+            var deliv_msg = 'Please selection an option below. ';
+            if (upcoming_pickup_sched_count > 0){
+              var deliv_msg = 'Please select an option below. ';
+            }
+
+            var pre_arrange = '';//'Or, if you have made a prior arrangement click here';
+
+            var msg = msg_base + deliv_msg + pre_arrange;
+
+            //             var msg_base = 'The following item'+mult+' cannot be shipped. You have the option for us to *deliver them to your home or sc'
+
+            var pd_prompt_item = document.createElement("div");
+            $(pd_prompt_item).attr('class','important-msg align-left');
+            $(pd_prompt_item).html(msg);
+
+            var pd_prompt_ul = document.createElement("ul");
+            $(pd_prompt_ul).attr('class','align-left no-mail-ul');
+
+            $('tr.cart-summary-item[requires-shipping="false"]').each(function( index ) {
+              if ( $(this).hasClass('cart-row-hide') ){
+
+              } else {
+                var pd_prompt_li = document.createElement("li");
+                $(pd_prompt_li).html($(this).attr('item-title'));
+                $(pd_prompt_ul).append(pd_prompt_li);
+              }
+            });
+
+            $('#pickup-delivery-prompt-div').append(pd_prompt_item);
+            $('#pickup-delivery-prompt-div').append(pd_prompt_ul);
+
+            $('table.section-b').css('display','table');
+          }
+        }
+      </script>
+
+      <style>
+        .important-msg{
+          font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          font-size: 1.3875em; 
+        }
+      </style>
+
+      <div id="pickup-delivery-prompt-div" class="cart-section section-b" style="padding:0; padding-top:5px;">
+      </div>
+      <div id="pickup-delivery-options-div" style="display:none; padding:0;" class="cart-section align-left">
+
+
+        <style>
+          div.pickup-delivery-options-container{
+            text-align: left;
+            display: block;
+            /* position: relative;
+
+            height: auto;
+            width: 500px;*/
+            margin: 5px auto;
+            padding: 10px;
+          }
+          div.pickup-delivery-options-container  .container{
+            /* display: block;
+            position: relative;
+            margin: 5px auto;
+            height: auto;
+            width: 500px;
+            padding: 10px;*/
+          }
+
+          div.pickup-delivery-options-container  h2 {
+            color: black;
+          }
+
+          div.pickup-delivery-options-container  .container ul{
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+          }
+
+          div.pickup-delivery-options-container ul li{
+            color: black;
+            display: block;
+            position: relative;
+            float: left;
+            width: 100%;
+            /*height: 60px;*/
+            /*border-bottom: 1px solid #333;*/
+          }
+
+          div.pickup-delivery-options-container  ul li input[type=radio]{
+            position: absolute;
+            visibility: hidden;
+          }
+
+          div.pickup-delivery-options-container  ul li label{
+            display: block;
+            position: relative;
+            font-weight: 300;
+            padding: 5px 25px 05px 70px;
+            margin-top: 10px;
+            margin-bottom: 2px auto;
+            z-index: 9;
+            cursor: pointer;
+            transition: border .25s linear;
+            -webkit-transition: border .25s linear;
+            font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+            font-size: 15px;
+            font-style: normal;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+
+          }
+          div.pickup-delivery-options-container ul li:hover label{
+            color: black;
+          }
+
+          div.pickup-delivery-options-container ul li .check{
+            display: block;
+            position: absolute;
+            border: 3px solid #AAAAAA;
+            border-radius: 100%;
+            height: 25px;
+            width: 25px;
+            top: 14px;
+            left: 20px;
+            z-index: 5;
+            transition: border .25s linear;
+            -webkit-transition: border .25s linear;
+          }
+
+          div.pickup-delivery-options-container ul li:hover .check {
+            border: 3px solid black;
+          }
+
+          div.pickup-delivery-options-container ul li .check::before {
+            display: block;
+            position: absolute;
+            content: '';
+            border-radius: 100%;
+            height: 12px;
+            width: 12px;
+            top: 3.5px;
+            left: 3.5px;
+            margin: auto;
+            transition: background 0.25s linear;
+            -webkit-transition: background 0.25s linear;
+          }
+
+          div.pickup-delivery-options-container input[type=radio]:checked ~ .check {
+            border: 3px solid black;
+            background-color: #fff; /*rgba(0,0,0,0.6);*/
+          }
+
+          div.pickup-delivery-options-container  input[type=radio]:checked ~ .check::before{
+            background: rgb(175, 115, 40);
+          }
+
+          div.pickup-delivery-options-container  input[type=radio]:checked ~ label{
+            color: black;
+            /* font-weight: bold;*/
+            text-decoration: underline;
+          }
+
+          div.pickup-delivery-options-container{
+            text-align: center; 
+            width: 1000px;
+          }
+/*           div.pickup-delivery-options-container > div.container { */
+          div.container {
+            box-sizing: border-box;
+            border: 1px solid black;
+            padding: 5px;
+            width: 1000px;
+            text-align: left;
+          }
+          div.pickup-delivery-options-container > div.container.container-no-pad {
+            padding: 0;
+          }
+          div.pickup-delivery-options-container > div.container.container-no-border {
+            border: none;
+          }
+        </style>
+        
+          <style>
+            div.full-width{
+              display: inline-block;
+              width: 100%;
+              padding: 0; 
+            }
+            .half-width{
+              box-sizing: border-box;
+              width: 50%;
+              float: left;
+              padding: 0;
+            }
+            .one-third-width{
+              box-sizing: border-box;
+              width: 33.33%;
+              float: left;
+              padding: 0;
+            }
+            div.sign-in{
+              font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+              font-weight: 500;
+              font-style: normal;
+              letter-spacing: 0.1em;
+              text-transform: uppercase;
+              font-size: 1em;
+              cursor: pointer;
+              text-align: center;
+            }
+
+            div#delivery-prompts.pickup div.full-width.delivery,
+            div#delivery-prompts.pickup div.full-width.other,
+            div#delivery-prompts.delivery div.full-width.pickup,
+            div#delivery-prompts.delivery div.full-width.other,
+            div#delivery-prompts.other div.full-width.delivery,
+            div#delivery-prompts.other div.full-width.pickup{
+              display:none;
+            }
+
+            
+            @media screen and (max-width: 1200px){
+              div.pickup-delivery-options-container{
+               width: 100%; 
+              }
+              div.pickup-delivery-options-container div.container{
+                width: 100%;
+              }
+              div.pickup-delivery-options-container  h2 {
+                font-size: 1.6875em;
+                width: 100%;
+              }
+            }
+            @media screen and (max-width: 1000px){
+              div.pickup-delivery-options-container  h2 {
+                font-size: 1em;/*1.6875em;*/
+              }
+              .btn-option-group .btn.btn-option.bigger-text{
+                font-size: 0.6em !important;
+              }
+              span.edit-btn-group i {
+               display: none; 
+              }
+              span.edit-btn-group span.edit-label{
+                opacity: 1 !important;
+                font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+                font-weight: 400;
+                font-style: normal;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                font-size: 0.8em;
+              }
+              main{
+               margin-bottom: 5px; 
+                padding-bottom: 5px !important;
+              }
+              hr.hr--large{
+               margin-top: 5px !important;
+                margin-bottom: 5px !important;
+              }
+              ul.social-icons{
+               text-align:center; 
+              }
+            }
+            @media screen and (max-width: 591px){
+              div.pickup-delivery-options-container  h2 {
+                font-size: 1em;/*1.6875em;*/
+              }
+              .btn-option-group .btn.btn-option.bigger-text{
+                font-size: 0.6em !important;
+              }
+              div.input-div {
+                padding-left: 0px !important;
+                text-align: center;
+              }
+              div.input-div label.delivery-new-add-label{
+                font-size: 0.8em;
+                display: inline-block;
+                width: 100%;
+                min-width: 35%;
+                text-align: center;
+              }
+              div.input-div input, div.input-div select{
+                margin: -3px 1px 5px 1px !important;
+                width: 100%;
+               font-size: 16px !important; 
+                background-position: right 5px center;
+              }
+              div.input-div #delivery-new-add-zip{
+                width: 30%;
+              }
+              span.edit-btn-group i {
+               display: none; 
+              }
+              span.edit-btn-group span.edit-label{
+                opacity: 1 !important;
+                font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+                font-weight: 400;
+                font-style: normal;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                font-size: 0.8em;
+              }
+              div.input-div #deliv-date{
+                font-size: 16px !important; 	
+                background-position: right 5px center;
+              }
+            }
+          </style>
+
+        <div id="pickup-delivery-inputs-container">
+          <div style="text-align:center;">
+            <div id="zip-table" class="popup-open" pop="zip20-pop">Which zips do we deliver to?</div>
+          </div>
+<!--           <div class="sign-in">Sign in to use a previous addr<span class="fa fa-sign-in" aria-hidden="true" style="padding-left: 2px;"></span></div> -->
+
+
+          <div id="delivery-prompts" class="pickup-delivery-options-container delivery">
+            <div class="container container-no-pad container-no-border">
+
+              <div class="full-width" style="text-align:center;">
+                <div class="btn-option-group btn-option-group-single">
+                  <input type="text">
+                  <button type="button" dtype="delivery" id="home-delivery-btn" value="HOME DELIVERY" class="delivery-type-tab btn btn-option no-margin bigger-text selected selected-no-border-bottom one-third-width" style="border-radius: 5px 5px 0px 0px; border-right: none;">Home Delivery</button>
+                  <button type="button" dtype="pickup" id="pick-up-btn"value="PICK UP" class="delivery-type-tab btn btn-option no-margin bigger-text selected-no-border-bottom one-third-width" style="border-radius: 5px 5px 0px 0px;">I'll Pick It up</button>
+                  <button type="button" dtype="other" id="other-arrange-btn"value="OTHER ARRANGEMENTS" class="delivery-type-tab btn btn-option no-margin bigger-text selected-no-border-bottom one-third-width" style="border-radius: 5px 5px 0px 0px; border-left: none;">Other Arrangements</button>
+                </div>
+              </div>     
+
+              <script>
+                 
+                $( document ).on( "click", ".delivery-type-tab", function() {
+                  var dtype = $(this).attr('dtype');
+                  console.log(dtype);
+                  $('#delivery-prompts').removeClass('delivery');
+                  $('#delivery-prompts').removeClass('pickup');
+                  $('#delivery-prompts').removeClass('other');
+                  $('#delivery-prompts').addClass(dtype);
+                });
+              </script>
+
+              <div class="container container-no-pad" style="margin-top: -9px; border-top: none;">
+				<div class="full-width other">
+                  <div class="input-div other other-note">
+                    <label id="other-note-label"
+                           class="delivery-new-add-label" 
+                           for="other-note"
+                           style="width: 100%; text-align: left;"
+                           >Special instructions/requests
+                    </label>
+                    <textarea style="width: 100%;" id="other-note" type="text"></textarea>
+                  </div>
+                </div>
+				<div class="full-width pickup">
+                  <h2 style="text-align: center;">Select a pickup option below</h2>
+                  <div class="btn-option-group btn-option-group-single" style="text-align: center;" id="pickup-option-group">
+                    <input type="text">
+                  </div>
+                </div>
+                <div class="full-width delivery">
+                  <div id="zip-msg-container" class="zip-check" >
+                    <h2 style="text-align: center;">Let's check your zip code first</h2>
+                    <h3 style="text-align: center; display: none;"></h3>
+                    <h4 style="text-align: center; display: none;"></h4>
+                    <h5 style="text-align: center; display: none;"></h5>
+                    <h6 style="text-align: center; display: none;"></h6>
+                    <hr style="margin-left: 25%; width: 50%; margin-right: 25%; margin-top: 0; margin-bottom: 10px;">
+                  </div>
+
+
+
+                  <div class="full-width" style="text-align:center; display:none;">
+                    <span id="zip-msg"></span>
+                  </div>
+
+                  <div class="input-div main addr-str" style="display:none;">
+                    <label id="addr-str-label"
+                           class="delivery-new-add-label" 
+                           for="addr-str"
+                           >Street Address
+                    </label>
+                    <input id="addr-str" type="text">
+                  </div>
+                  <div class="input-div main addr-apt" style="display:none;">
+                    <label id="addr-apt-label"
+                           class="delivery-new-add-label" 
+                           for="addr-apt"
+                           >Apt/Suite #
+                    </label>
+                    <input id="addr-apt" type="text">
+                  </div>
+                  <div class="input-div main addr-city" style="display:none;">
+                    <label id="addr-city-label"
+                           class="delivery-new-add-label" 
+                           for="addr-city"
+                           >City
+                    </label>
+                    <input id="addr-city"type="text" disabled=true>
+                  </div>
+                  <div class="input-div main addr-state" style="display:none;">
+                    <label id="addr-state-label"
+                           class="delivery-new-add-label" 
+                           for="addr-state"
+                           >State
+                    </label>
+                    <select id="addr-state" disabled=true>
+                      <option id="KS" value="KS">KS</option>
+                      <option id="MO" value="MO">MO</option>
+                    </select>
+                  </div>
+                  <style>
+                    div.input-div.zip > span.edit-btn-group{ display:none;}
+                    div.input-div.zip.disabled > span.edit-btn-group {
+                      display: inline-block; 
+                    }
+                    div.input-div.zip.disabled > span.edit-btn-group > span.edit-label {
+                      opacity: 0;
+                    }
+                    div.input-div.zip.disabled > span.edit-btn-group {
+                      cursor: pointer;
+                    }
+                    div.input-div.zip.disabled > span.edit-btn-group:hover > span.edit-label{
+                      opacity: 1;
+                      font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+                      font-weight: 400;
+                      font-style: normal;
+                      letter-spacing: 0.1em;
+                      text-transform: uppercase;
+                      font-size: 0.8em;
+                    }
+                  </style>
+
+                  <div class="input-div zip cart-attribute__field">
+                    <label id="delivery-new-add-zip-label"
+                           class="delivery-new-add-label" 
+                           for="delivery-new-add-zip"
+                           >ZIP
+                    </label>
+                    <input onkeyup="validate_zip_code(this)" id="delivery-new-add-zip" type="text">
+                    <script>
+                      function add_delivery_item(comp_q_amt,comp_z_amt,pickup_amt,deliv_amt,cooler_a){
+                        var complimentary_qualifying_id = 50746545924;
+                        jQuery.post('/cart/update.js', {updates: {
+                           50746545924: comp_q_amt // complimentary qualifying
+                          ,50746474180: comp_z_amt //complimentary zone 
+                          ,50746671556: pickup_amt //pickup
+                          ,45327683844: deliv_amt  //delivery 20
+//                           ,38548144132: cooler_amt  //delivery 20
+                        }});
+                      }
+                      function add_cooler_product(){
+                        var complimentary_qualifying_id = 50746545924;
+                        jQuery.post('/cart/update.js', {updates: {
+                           228703600644: 1 // complimentary qualifying
+                        }});
+                      }
+//                       function getCartTotalWithoutDelivery(){
+//                         $.get("cart.js", function(data, status){
+//                           var xdata = data.substring(data.indexOf('"items":'),1000);
+//                           console.log(xdata);
+//                           console.log("Data: " + data + "\nStatus: " + status);
+//                         });
+//                       }
+// getCartTotalWithoutDelivery()
+                    </script>
+                    <span class='edit-btn-group'><i class="fa fa-times edit-btn" aria-hidden="true"></i><span class='edit-label'>Change ZIP</span></span>
+                  </div>
+                  <script>
+                    $( document ).on( "click", "span.edit-btn-group", function() {
+                      $(this).parent().removeClass('disabled');
+                      $(this).parent().find('input').prop('disabled',false);
+                      $('div.input-div.main').css('display','none');
+                      $('#delivery-new-add-zip').val('');
+                      $('#delivery-new-add-zip').trigger('change');
+
+                      $('#zip-msg-container').children().each(function () {
+                        $(this).html('');
+                        $(this).css('display','');
+                      });
+                      $('#zip-msg-container').find('h2').html('Let\'s check your zip code first').css('display','');
+
+                    });
+                  </script>
+                  <div class="input-div main deliv-date" style="display:none;">
+                    <label id="deliv-date-label"
+                           class="delivery-new-add-label" 
+                           for="deliv-date"
+                           >Delivery Date
+                    </label>
+                    <select id="deliv-date">
+                      <option></option>
+                    </select>
+                  </div>
+                  
+                  <style>
+                    div.cooler-msg{
+                      margin-top: 15px;
+                      font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+                      padding: 10px 50px;
+                      border: 1px solid #eee;
+                    }
+                    div.cooler-msg span{
+                      display:block;
+                      font-size: 0.9rem;
+                    }
+                    div.cooler-msg span:first-child{
+                      display:block;
+                      text-align: center;
+                      font-size: 1.2rem;
+                      font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+                      text-transform: uppercase;
+                      font-weight: 600;
+                    }
+                    div.cooler-msg span.ackn{
+                      font-size: 1rem;
+                      text-align: center;
+                      border: 2px solid #eee;
+                      width: 200px;
+                      font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+                      cursor:pointer;
+                    }
+                    div.cooler-msg span.ackn > i{
+                      width: 20px;
+                    }
+                    .noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+                  </style>
+                  <script>
+                    $( document ).on( "click", "span.cooler-msg.ackn[acknowledged='false']", function() {
+                      var elm = $(this);
+                      $(elm).attr('acknowledged','changing');
+                        $(this).find('.fa-square-o').slideUp(200, function() {
+                          $(this).removeClass('fa-square-o');
+                          $(this).addClass('fa-check-square');
+                          $(this).css('color','#00C851');
+                          $(this).slideDown();
+                          $(elm).css('border-color','#00C851');
+                        });
+                        $(elm).attr('acknowledged',true)
+//                         jQuery.post('/cart/add.js', { 
+//                           quantity: 1,
+//                           id: '228703600644'
+//                         });
+                        add_cooler_product();
+                      check_delivery_fields();
+                    });
+                    $( document ).on( "click", "span.cooler-msg.ackn[acknowledged='true']", function() {
+                      var elm = $(this);
+                      var ackn = $(elm).attr('acknowledged');
+                      $(elm).attr('acknowledged','changing');
+                        $(this).find('.fa-check-square').slideUp(200, function() {
+                          $(this).removeClass('fa-check-square');
+                          $(this).addClass('fa-square-o');
+                          $(this).css('color','');
+                          $(this).slideDown();
+                          $(elm).css('border-color','#eee');
+                        });
+                          $(elm).attr('acknowledged',false)
+                      check_delivery_fields();
+                    });
+                   </script>
+                  <div class="cooler-msg input-div main deliv-date" style="display:none;">
+                    <span class="cooler-msg">One more thing!</span>
+                    <span class="cooler-msg">We want you to enjoy cooking the delicious product we are delivering to your doorstep, we don't want it to cook in the sun <b>ON</b> your porch!</span>
+                    <span class="cooler-msg">To protect your delivery from baking prematurely, please leave a cooler outside (don't forget the ice!), and we'll place your delivery inside.</span>
+                    <span class="cooler-msg">Don't have a cooler? Forget to leave one out? No problem, we'll leave one of our own.</span>
+                    <span class="cooler-msg">If we don't have to use one of ours, we'll refund the $8 cooler charge after delivery!</span>
+                    <span class="cooler-msg ackn noselect" acknowledged=false><i class="fa fa-square-o" aria-hidden="true"></i> I Understand</span>
+                  </div>
+                  <!--
+                  <div class="input-div main deliv-date" style="display:none;">
+                    <label id=""
+                           class="delivery-new-add-label" 
+                           for=""
+                           >I understand
+                    </label>
+                    <select id="">
+                      <option></option>
+                    </select>
+                  </div>
+                  -->
+                </div>
+
+                <script>
+                  $( document ).on( "change", ".input-div", function() {
+                    check_delivery_fields()
+                  });
+                  $( document ).on( "keyup", ".input-div", function() {
+                    check_delivery_fields()
+                  });
+                  $( document ).on( "click", ".input-div", function() {
+                    check_delivery_fields()
+                  });
+                  $('#delivery-prompts .btn-option-group-single > input').change(function() {
+                    check_delivery_fields();
+                  });
+
+                  $( document ).on( "change", "#other-notes", function() {
+                    check_delivery_fields()
+                  });
+                  $( document ).on( "click", "#other-notes", function() {
+                    check_delivery_fields()
+                  });
+                  $( document ).on( "keyup", "#other-notes", function() {
+                    check_delivery_fields()
+                  });
+                  function check_delivery_fields(){
+                    if ( $('#delivery-prompts').hasClass('delivery') ) {
+                      var str = $('#addr-str').val();
+                      var apt = $('#addr-apt').val();
+                      var city = $('#addr-city').val();
+                      var st = $('#addr-state').val();
+                      var zip = $('#addr-zip').val();
+                      var deliv_date = $('#deliv-date').val();
+                      $('#confirm-btn').prop('disabled',true); 
+                      if ( $('span.cooler-msg.ackn').attr('acknowledged')=='true'){
+                        if ( str !== '' && city !== '' ){
+                          if ( st !== '' && deliv_date !=='' ){
+                            $('#confirm-btn').prop('disabled',false); 
+                          }
+                        }
+                      }
+                    }
+                    if ( $('#delivery-prompts').hasClass('pickup') ) {
+                      add_delivery_item(0,0,1,0)//comp_q_amt,comp_z_amt,pickup_amt,deliv_amt
+                      var sel = $('#pickup-option-group').find('button.selected').length
+                      console.log('abc '+sel);
+                      $('#confirm-btn').prop('disabled',true); 
+                      if ( sel > 0 ){
+                          $('#confirm-btn').prop('disabled',false); 
+                      }
+                    }
+                    if ( $('#delivery-prompts').hasClass('other') ) {
+                      add_delivery_item(0,0,0,0)//comp_q_amt,comp_z_amt,pickup_amt,deliv_amt
+                      $('#confirm-btn').prop('disabled',false); 
+                    }
+                    populate_instructions();
+                  }
+                  function confirm_btn(){
+//                    $('.btn.cart__checkout').css('display',''); 
+                    $('.btn.cart__checkout').click(); 
+//                     add_delivery_item();
+                  }
+                  
+                  function populate_instructions(){
+                    var type = '';
+                    var a,b,c,d,e,f,g;
+                    var text;
+                    if ( $('#home-delivery-btn').hasClass('selected') ){
+                      type = 'DELIVERY';
+                      a = 'TYPE: '+type;
+                      b = 'WHEN: '+$('#deliv-date').val();
+                      c = 'STREET: '+$('#addr-str').val();
+                      d = 'APT #: '+$('#addr-apt').val();
+                      e = 'CITY: '+$('#addr-city').val();
+                      f = 'STATE: '+$('#addr-state').val();
+                      g = 'ZIP: '+$('#delivery-new-add-zip').val();
+                      text = a+'\n'+b+'\n'+c+'\n'+d+'\n'+e+'\n'+f+'\n'+g;
+                    };
+                    if ( $('#pick-up-btn').hasClass('selected') ){ 
+                      type = 'PICKUP';
+                      a = 'TYPE: '+type;
+                      b = 'DATE: '+$('#pickup-option-group').find('button.selected').attr('date');
+                      c = 'LOCATION: '+$('#pickup-option-group').find('button.selected').attr('location');
+                      d = $('#pickup-option-group').find('button.selected').html();//.replace('<br>','\n').replace('<b>','').replace('</b>','');
+                      text = a+'\n'+b+'\n'+c+'\n'+d;//+'\n'+e+'\n'+f+'\n'+g;
+                    };
+                    if (  $('#other-arrange-btn').hasClass('selected') ){ 
+                      type = 'OTHER' 
+                      a = 'TYPE: '+type;
+                      b = 'NOTES: '+$('#other-note').val();
+                      text = a+'\n'+b;
+                    };
+                    
+
+                    //             var how = $('#pickup-delivery-options-container-h2 span').html();
+                    //             if ( how !== '' ) {how='HOW WOULD YOU LIKE TO RECEIVE YOUR ORDER? '+ how};
+
+                    var d_where = $('#delivery-options-container-h2 span').html();
+                    if ( d_where !== '' ) {d_where='WHERE SHOULD WE DELIVER IT? ' + d_where};
+
+                    var d_when = $('#delivery-when-options-container-h2 span').html();
+                    if ( d_when !== '' ) {d_when = 'WHEN SHOULD WE DELIVER IT? ' + d_when};
+
+                    var pickup = $('#pickup-when-options-container-h2 span').html();
+                    if ( pickup !== '' ) {pickup = 'WHEN AND WHERE WOULD YOU LIKE TO PICK IT UP? '+pickup};
+                    $('#CartSpecialInstructions').val(text);
+                  }
+                  
+                </script>
+              </div>
+            </div>
+          </div>
+          <!--
+          <button type="button" class="btn" onclick="$('#AddToCart').click();">Add Delivery To cart</button>
+          -->
+          <div class="container no-display">
+            <div class="checker">
+              <label id="shipping-count-label"
+                     class="delivery-new-add-label" 
+                     for="shipping-count"
+                     >Shipping Item Count
+              </label>
+              <input id="shipping-count" type="number" disabled=true>
+            </div>
+            <div class="checker">
+              <label id="hdelivery-count-label"
+                     class="delivery-new-add-label" 
+                     for="hdelivery-count"
+                     >Home Delivery Item Count
+              </label>
+              <input id="hdelivery-count" type="number" disabled=true>
+            </div>
+            <div class="checker">
+              <label id="zip-entered-label"
+                     class="delivery-new-add-label" 
+                     for="zip-entered"
+                     >ZIP
+              </label>
+              <input id="zip-entered" type="text" disabled=true>
+            </div>
+            <div class="checker">
+              <label id="hdelivery-zone-label"
+                     class="delivery-new-add-label" 
+                     for="hdelivery-zone"
+                     >Home Delivery Zone
+              </label>
+              <input id="hdelivery-zone" type="text" disabled=true>
+            </div>
+            <div class="checker">
+              <label id="cart-total-label"
+                     class="delivery-new-add-label" 
+                     for="cart-total"
+                     >Cart Total
+              </label>
+              <input id="cart-total" type="number" value={{ cart.total_price }} disabled=true>
+            </div>
+            <div class="checker">
+              <label id="delivery-product-necessary-label"
+                     class="delivery-new-add-label" 
+                     for="delivery-product-necessary"
+                     >Delivery Product Necessary
+              </label>
+              <select id="delivery-product-necessary" type="text" >
+                <option></option>
+                <option value="TRUE" text="TRUE">TRUE</option>
+                <option value="FALSE" text="FALSE">FALSE</option>
+              </select>
+            </div>
+            <div class="checker">
+              <label id="delivery-product-in-cart-label"
+                     class="delivery-new-add-label" 
+                     for="delivery-product-in-cart"
+                     >Delivery Product In Cart
+              </label>
+              <select id="delivery-product-in-cart" type="text" >
+                <option></option>
+                <option value="TRUE" text="TRUE">TRUE</option>
+                <option value="FALSE" text="FALSE">FALSE</option>
+              </select>
+            </div>
+            <div class="checker">
+              <label id="cooler-product-in-cart-label"
+                     class="delivery-new-add-label" 
+                     for="cooler-product-in-cart"
+                     >Cooler Product In Cart
+              </label>
+              <select id="cooler-product-in-cart" type="text" >
+                <option></option>
+                <option value="TRUE" text="TRUE">TRUE</option>
+                <option value="FALSE" text="FALSE">FALSE</option>
+              </select>
+            </div>
+          </div>
+          
+          <style>
+            .btn-option-group input{
+              display:none;
+            }
+            .btn-option-group .btn.btn-option{
+              background-color: #fff; 
+              color: black;
+              border-color: black;
+              margin: 2px 5px;
+            }
+            .btn-option-group .btn.btn-option.full-width{
+              width: 90%;
+            }
+            .btn-option-group .btn.btn-option.no-margin{
+              margin: 0;
+            }
+            .btn-option-group .btn.btn-option.bigger-text{
+              font-size: 1em;
+              padding: 8px 0px;
+            }
+            .btn-option-group .btn.btn-option.selected{
+              background-color: black; 
+              color: #fff;
+            }
+            
+            .btn-option-group .btn.btn-option.selected-no-border-bottom{
+              background-color: #757575; 
+              color: #fff;
+              box-shadow: inset -5px -10px 25px rgba(0,0,0,0.4);
+            }
+            .btn-option-group .btn.btn-option.selected.selected-no-border-bottom{
+              border-bottom: transparent;
+              background-color: #fff; 
+              color: black;
+              box-shadow: none;
+            }
+            
+            .btn-option-group .btn.btn-option:focus{
+              outline: none;
+            }
+            .btn-option-group .btn.btn-option:hover {
+              box-shadow: 0 3px 6px rgba(150,150,150,0.8);
+              transition: all 0.3s ease-in-out;
+            }
+            .btn-option-group .btn.btn-option.selected-no-border-bottom:hover{
+              box-shadow: inset -5px -10px 50px rgba(0,0,0,0.8);
+            }
+            .btn-option-group .btn.btn-option.selected:hover {
+              box-shadow: none;
+              transition: all 0.3s ease-in-out;
+            }
+          </style>
+          <script>
+            $( document ).on( "click", ".btn-option-group-multiple .btn-option", function() {
+              $(this).toggleClass('selected');
+              $(this).toggleClass('unselected');
+              var selected_arr = [];
+              $(this).parent().children('.btn.btn-option.selected').each(function () {
+                var val = $(this).attr('value');
+                if($(this)[0].hasAttribute("value")){
+                  selected_arr.push('"'+val+'"');
+                }
+              });
+              if(selected_arr.length > 0 ){
+                selected_arr = '['+selected_arr+']';
+              }else{
+                selected_arr='';
+              }
+              $(this).parent().children('input').each(function () {
+                $(this).val(selected_arr);
+              });
+            });
+            $( document ).on( "click", ".btn-option-group-single .btn-option", function() {
+              var sel_unsel = 'select';
+              if ( $(this).hasClass('selected') ){
+                sel_unsel = 'unselect';
+                console.log('already selected');
+              } else {
+                $(this).parent().children('.btn.btn-option').each(function () {
+                  $(this).removeClass('selected');
+                  $(this).addClass('unselected');
+                });
+                if ( sel_unsel == 'select' ){
+                  $(this).addClass('selected'); 
+                  $(this).removeClass('unselected'); 
+                  var val = $(this).attr('value');
+                  $(this).parent().children('input').each(function () {
+                    $(this).val(val);
+                    $(this).trigger('change');
+                  });
+                };
+                if ( sel_unsel == 'unselect' ){ 
+                  $(this).removeClass('selected');
+                  $(this).addClass('unselected');
+                  if($(this)[0].hasAttribute("value")){
+                    $(this).parent().children('input').each(function () {
+                      $(this).val('');
+                      $(this).trigger('change');
+                    });
+                  }
+                };
+              }
+            });
+
+          </script>
+          <div id="pickup-prompts" class="pickup-delivery-options-container" style="display:none;">
+            <div class="container">
+              <h2>When and where would you like to pick it up?<i class="fa fa-check-circle-o fa-fw" aria-hidden="true" style="vertical-align: middle;"></i></h2>
+              <div class="btn-option-group btn-option-group-single" id="xxxxpickup-option-group">
+                <input type="text">
+              </div>
+            </div>
+          </div>
+        </div>    
+        <!-- start test -->
+        <script>
+
+          function opcon_hide(selector){
+            $(selector).slideUp();    
+          }
+          function opcon_show(selector){
+            $(selector).slideDown();
+            if ( selector.indexOf('-h2') < 0 ){
+              opcon_hide(selector+'-h2')
+            }
+          }
+
+          $('.pickup-delivery-options-container input:radio').change(function() {
+            console.log('test1');
+            console.log('test2'+this.checked);
+            console.log('test3'+this.id);
+            if ( this.checked && this.id=='delivery-option'){
+              opcon_hide('#pickup-prompts');
+              opcon_show('#delivery-prompts');
+              $(this).parent().parent().parent().addClass('valid');
+              $('tr.cart-summary-item td:nth-child(2)').each(function(index){
+                if ( $(this).parent().attr('requires-shipping') == 'false' ){
+                  $(this).html('Home Delivery');
+                }
+              });
+            }
+            else if ( this.checked && this.id=='pickup-option'){
+              opcon_hide('#delivery-prompts');
+              opcon_show('#pickup-prompts');
+              $('tr.cart-summary-item td:nth-child(2)').each(function(index){
+                if ( $(this).parent().attr('requires-shipping') == 'false' ){
+                  $(this).html('Pick Up');
+                }
+              });
+            }
+            else if ( this.checked && this.id=='other-option'){
+              opcon_hide('#delivery-prompts');
+              opcon_hide('#pickup-prompts');
+              $('tr.cart-summary-item td:nth-child(2)').each(function(index){
+                if ( $(this).parent().attr('requires-shipping') == 'false' ){
+                  $(this).html('Other Arrangement');
+                }
+              });
+            }
+            populate_instructions();
+          });
+
+
+
+        </script>
+        <h2 class="option-picked" id="delivery-options-container-h2" style="display:none;">WHERE SHOULD WE DELIVER IT?<span class="option-val"></span></h2>
+        <div id="delivery-options-container" style="display:none;" class="pickup-delivery-options-container">
+          <div class="container">
+            <h2>Where should we deliver it?</h2>
+            <ul id="delivery-loc-ul">
+              {% unless customer %}
+              <span>Sign in to select from a previously used address</span> 
+              <li>
+                <input type="radio" id="sign-in-opt" name="selector">
+                <label for="sign-in-opt">Sign in to select from a previously used address</label>
+                <div class="check"></div>
+              </li>
+              {% endunless %}
+              {% if customer %}
+              <li>
+                <input type="radio" 
+                       class="account-address" 
+                       name="selector" 
+                       id="delivery_address_{{customer.default_address.id }}" 
+                       value="{{customer.default_address.id }}" 
+                       street1="{{customer.default_address.address1 }}"
+                       street2="{{customer.default_address.address2 }}"
+                       city="{{customer.default_address.city}}"
+                       state="{{customer.default_address.province_code}}"
+                       zip="{{customer.default_address.zip}}"
+                       {% if cart.attributes["delivery_address"] == {{customer.default_address.id }} %} checked{% endif %}
+                       > 
+                <label 
+                       id="delivery_address_label_{{customer.default_address.id }}" 
+                       class="delivery-pickup-table-text" 
+                       for="delivery_address_{{customer.default_address.id }}"
+                       >
+                  {{customer.default_address.street }}, {{customer.default_address.city}}, {{customer.default_address.province_code}} {{customer.default_address.zip}}
+                </label>
+                <div class="check"></div>
+              </li>
+              {% for address in customer.addresses %}
+              {% if address.id != customer.default_address.id %}
+              <li>
+                <input type="radio" 
+                       class="account-address" 
+                       name="selector" 
+                       id="delivery_address_{{address.id }}" 
+                       value="{{address.id }}" 
+                       street1="{{address.address1 }}"
+                       street2="{{address.address2 }}"
+                       city="{{address.city}}"
+                       state="{{address.province_code}}"
+                       zip="{{address.zip}}"
+                       {% if cart.attributes["delivery_address"] == "Local Delivery (Select ZIP Codes)" %} checked{% endif %}
+                       > 
+                <label 
+                       id="delivery_address_label_{{address.id }}" 
+                       class="delivery-pickup-table-text" 
+                       for="delivery_address_{{address.id }}"
+                       >
+                  {{address.street }}, {{address.city}}, {{address.province_code}} {{address.zip}}
+                </label>
+                <div class="check"></div>
+              </li>
+              {% endif %}
+              {% endfor %}
+              {% endif %}
+              <li>
+                <input type="radio" id="delivery-add-new" name="selector">
+                <label for="delivery-add-new">Enter an address</label>
+                <div class="check"></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <style>
+          #delivery-new-add-container{
+            text-align: left; 
+            display: inline-block;
+            border: 1px solid black;
+          }
+          div.input-div{
+            padding-left: 20px;
+          }
+          div.input-div input,
+          div.input-div select{
+            padding: 4px 6px;
+            margin: 4px 4px;
+            border-left: 1px solid #757575;
+            border-right: 1px solid #757575;
+            border-top: 1px solid #757575;
+            border-bottom: 2px solid black;
+
+            font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            min-width: 70px;
+          }
+          div.input-div input#delivery-new-add-street1,
+          div.input-div input#delivery-new-add-street2,
+          div.input-div input#delivery-new-add-city{
+            min-width: 300px;
+          }
+          #zip-msg{
+            font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+            font-weight: 500;
+            font-style: normal;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-size: 1em;
+            padding: 5px;
+            border-radius: 3px;
+          }
+          #zip-msg>span.empha{
+            font-size: 1.35em;
+          }
+          #zip-table{
+            font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+            font-weight: 500;
+            font-style: normal;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            padding: 1px 5px;
+            border-radius: 3px;
+            text-align: center;
+            text-decoration: underline;
+            cursor: pointer;
+          }
+          label.delivery-new-add-label{
+            font-family: "Montserrat","HelveticaNeue","Helvetica Neue",sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-size: 1.0em;
+            display: inline-block;
+            width: 45%;/*180px;*/
+            min-width: 180px;
+            text-align: right;
+          }
+          div.cart__note{
+/*             display:none !important;  */
+          }
+        </style>
+        <script>
+          function validate_zip_code(elm) {
+            var val = $(elm).val().replace(/\D/g, '').replace(/-/g, '');
+            var zip = val;
+            var isValidZip5 = /(^\d{5}$)/.test(val);
+            var isValidZip9 = /(^\d{9}$)|(^\d{5}-\d{4}$)/.test(val);
+            if (isValidZip5) {
+              $(elm).val(zip)
+            };
+            if (isValidZip9) {
+              $(elm).val(zip.substr(0, 5) + '-' + zip.substr(5))
+            };
+            if (!isValidZip5 && !isValidZip9) {
+              $(elm).css('color', 'red');
+              $('#zip-msg').html('ZIP is invalid');
+              $('#zip-msg').css('background-color','#fff');
+              $('#zip-msg').css('color','red');
+            }
+            if (isValidZip5 || isValidZip9) {
+              $('[dmethod="delivery"]').each(function(){
+                $(this).slideDown();
+              });
+              $('#zip-msg-container').children().each(function () {
+                $(this).html('');
+                $(this).css('display','');
+              });
+              $('#zip-msg').html('');
+              if($(elm).attr('id')!=='address-zip'){
+                $(elm).css('color', 'black');
+              } else {
+                $(elm).css('color', '#efefef');
+              }
+              var zip5 = zip.substr(0, 5);
+              $.ajax({
+                url: "https://api.zippopotam.us/us/" + zip5,
+                cache: false,
+                dataType: "json",
+                type: "GET",
+                success: function(result, success) {
+                  places = result['places'][0];
+                  var city = places['place name'];
+                  var state = places['state'];
+                  var state_abv = places['state abbreviation'];
+                  var stfull = state + ' - ' + state_abv;
+                  console.log(state_abv);
+                  $('#addr-city').val(city);
+                  $('#address-city').val(city);
+                  $('#addr-state').val(state_abv);
+                  $('#address-state').val(state_abv);
+                  $('#delivery-new-add-city').val(city);
+                  $('#address-city').val(city);
+                  $('#delivery-new-add-state').val(state_abv);
+                  $('#address-state').val(state_abv);
+                  // 				$("#delivery-new-add-state[id=" + state_abv + "]").attr("selected", "selected");
+                },
+                error: function(result, success) {}
+              });
+              var zip_deliv = validate_zip(zip5);
+              $('#hdelivery-zone').val(zip_deliv);
+              $('#zip-entered').val(zip5);
+              
+              var cart_total = $('#cart-total').val();
+
+              if ( zip_deliv == 'available'){
+                document.activeElement.blur();
+                if ( cart_total > free_delivery_threshold_cents ){
+                  $('.zip-span').each(function( index ) {
+                    $(this).html(zip5);
+                  });
+                  $(elm).prop('disabled',true);
+                  $('.input-div.zip').addClass('disabled');
+                  $('#zip-msg-container').find('h4').html('This order qualifies for free delivery to addresses in '+zip5+'!').css('display','');
+                  $('.sub-msg').html('This order qualifies for free delivery to addresses in '+zip5+'!').css('display','');
+//                   $('#zip-msg-container').find('h5').html('The $20 delivery fee is waived on orders over $'+free_delivery_threshold_dollars+' '+cart_total).css('display','');
+                  $('div.input-div.main').css('display','');
+                  add_delivery_item(1,0,0,0)//comp_q_amt,comp_z_amt,pickup_amt,deliv_amt
+                } else {
+                  $('.zip-span').each(function( index ) {
+                    $(this).html(zip5);
+                  });
+                  $(elm).prop('disabled',true);
+                  $('.input-div.zip').addClass('disabled');
+
+                  $('#zip-msg-container').find('h3').html('There is a $'+delivery_fee+' delivery charge for home deliveries in '+zip5).css('display','');
+                  $('#zip-msg-container').find('h5').html('This fee is waived on orders over $'+free_delivery_threshold_dollars).css('display','');
+                  $('div.input-div.main').css('display','');
+                add_delivery_item(0,0,0,1)//comp_q_amt,comp_z_amt,pickup_amt,deliv_amt
+                }
+              }
+
+              else if ( zip_deliv == 'free' ){
+                $('.zip-span').each(function( index ) {
+                  $(this).html(zip5);
+                });
+                $(elm).prop('disabled',true);
+                $('.input-div.zip').addClass('disabled');
+
+                $('#zip-msg-container').find('h2').html('Hey Neighbor!').css('display','');
+                $('.main-msg').html('Hey Neighbor!').css('display','');
+                $('#zip-msg-container').find('h4').html('Addresses in '+zip5+' qualify for complimentary home delivery!').css('display','');
+                $('.sub-msg').html('Addresses in '+zip5+' qualify for complimentary home delivery!').css('display','');
+
+                $('div.input-div.main').css('display','');
+                document.activeElement.blur();
+                add_delivery_item(0,1,0,0)//comp_q_amt,comp_z_amt,pickup_amt,deliv_amt
+              }
+              else {
+                $('.zip-span').each(function( index ) {
+                  $(this).html(zip5);
+                });
+                
+                $('#zip-msg-container').find('h3').html('We don\'t currently offer home delivery to '+zip5+'.').css('display','');
+                $('#zip-msg-container').find('h4').html('Think we should deliver to '+zip5+'? '+'<a target="_blank" style="color: blue;" href="https://kccattlecompany.com/pages/contact-us">Let us know&nbsp;<i class="fa fa-envelope-o" aria-hidden="true"></i></a>').css('display','');
+                $('#zip-msg-container').find('h5').html('<a class="popup-open" pop="zip20-pop">Which zips do we deliver to?</a>').css('display','');
+                $(elm).val('');
+                $('div.input-div.main').css('display','none');
+                document.activeElement.blur();
+              add_delivery_item(0,0,0,0)//comp_q_amt,comp_z_amt,pickup_amt,deliv_amt
+              }
+              console.log(zip_deliv);
+            }
+            check_for_delivery_product_in_cart();
+            check_for_cooler_product_in_cart();
+            check_if_delivery_product_necessary();
+          }
+          function check_if_delivery_product_necessary(){
+            var bool = false;
+            var txt = 'FALSE';
+            var hdeliv_count = $('#hdelivery-count').val();
+            if ( hdeliv_count > 0 ){
+              var hdeliv_zone = $('#hdelivery-zone').val();
+              if ( hdeliv_zone == 'available' ){
+               	var cart_total = $('#cart-total').val();
+                if ( cart_total < free_delivery_threshold_cents ){
+                 bool = true; 
+                  txt = 'TRUE';
+                }
+              }
+            }
+            $('#delivery-product-necessary').val(txt);
+            return bool;
+          }
+          function check_for_delivery_product_in_cart(){
+            var d_prd_id = '11434418180';
+            var bool = false;
+            if ( $('tr.cart-summary-item[product-id=11434418180]').length > 0 ){
+              $('#delivery-product-in-cart').val('TRUE');
+              bool = true;
+            } else {
+              $('#delivery-product-in-cart').val('FALSE');
+            }
+            return bool;
+          }
+          
+          function check_for_cooler_product_in_cart(){
+            var d_prd_id = '38548144132';
+            var bool = false;
+            if ( $('tr.cart-summary-item[product-id=38548144132]').length > 0 ){
+              $('#cooler-product-in-cart').val('TRUE');
+              bool = true;
+            } else {
+              $('#cooler-product-in-cart').val('FALSE');
+            }
+            return bool;
+          }
+          
+          function saveAddress(){
+            var add =  $('#addr-str').val();
+            var apt =  $('#addr-apt').val();
+            var city =  $('#addr-city').val();
+            var state =  $('#addr-state').val();
+            var zip =  $('#addr-zip').val();
+
+            var li = document.createElement('li');
+            $(li).attr('id','new-add-li');
+            var inp = document.createElement('input');
+            $(inp).prop('type','radio');
+            $(inp).attr('class','account-address');
+            $(inp).attr('name','selector');
+            $(inp).attr('id','delivery_address_input');
+            $(inp).attr('street1',add);
+            $(inp).attr('street2',apt);
+            $(inp).attr('city',city);
+            $(inp).attr('state',state);
+            $(inp).attr('zip',zip);
+            var lbl = document.createElement('label');
+            $(lbl).prop('for','delivery_address_lbl');
+            if ( apt !== '' ){ var aptx = apt+', ' };
+            $(lbl).html(add+', '+apt+city+', '+state+' '+zip);
+            var dv = document.createElement('div');
+            $(dv).attr('class','check');
+            $(li).append(inp);
+            $(li).append(lbl);
+            $(li).append(dv);
+            $('#delivery-loc-ul').append(li);
+            $('#delivery_address_input').trigger('click');
+
+            opcon_hide('#delivery-options-container');
+            opcon_hide('#delivery-options-container');
+            opcon_hide('#delivery-new-add-container');
+            opcon_show('#delivery-when-options-container');
+            populate_instructions();
+          }
+
+          $('div.input-div input').change(function(){
+            console.log('change');
+            new_add_valid()
+          });
+          $('div.input-div input').keyup(function(){
+            console.log('keyup');
+            new_add_valid()
+          });
+
+          function new_add_valid(){
+            var add1 =  $('#addr-str').val();
+            var city =  $('#addr-city').val();
+            var state =  $('#addr-state').val();
+            
+            if ( add1.length > 5 && ( city.length > 3 && state !== '')){
+              $('div.input-div.next').css('display','');
+            } else {
+              $('div.input-div.next').css('display','none');
+            }
+          }
+
+          $('#delivery-options-container-h2').click(function() {
+            opcon_hide('#delivery-options-container-h2');
+            opcon_hide('.pickup-delivery-options-container');
+            opcon_show('#delivery-options-container');
+            populate_instructions();
+          });
+          $("#delivery-options-container").on('change', 'input:radio', function() {
+            if ( this.id=='sign-in-opt'){
+              window.location.href = 'https://kccattlecompany.com/account';
+            }
+            else if ( this.checked && ( this.id!=='delivery-add-new' && this.id!=='sign-in-opt')){
+              var add = $(this).next().html();
+              $('#delivery-options-container-h2 span').html(add);
+              opcon_show('#delivery-options-container-h2');
+              opcon_hide('#delivery-options-container');
+              opcon_show('#delivery-when-options-container');
+              populate_instructions();
+            } else if ( this.checked && this.id=='delivery-add-new'){
+              opcon_hide('#delivery-when-options-container');
+              opcon_show('#delivery-new-add-container');
+              populate_instructions();
+            }
+          });
+        </script>
+
+        <h2 class="option-picked" id="delivery-when-options-container-h2" style="display:none;">WHEN SHOULD WE DELIVER IT?<span class="option-val"></span></h2>
+        <div id="delivery-when-options-container" style="display:none;" class="pickup-delivery-options-container">
+          <!-- start test -->
+          <div class="container">
+            <h2>When should we deliver it?</h2>
+            <ul id="delivery-date-ul">
+            </ul>
+          </div>
+        </div>
+        <script>
+
+          
+          $("#delivery-when-options-container").on('change', 'input:radio', function() {
+            var val = $(this).next().html();
+            $('#delivery-when-options-container-h2 span').html(val);
+            opcon_show('#delivery-when-options-container-h2');
+            opcon_hide('#delivery-when-options-container');
+            populate_instructions();
+          });
+        </script>
+
+        <h2 class="option-picked" id="pickup-when-options-container-h2" style="display:none;">WHEN AND WHERE WOULD YOU LIKE TO PICK IT UP?<span class="option-val"></span></h2>
+        <div id="pickup-when-options-container" style="display:none;" class="pickup-delivery-options-container">
+          <!-- start test -->
+          <div class="container">
+            <h2>When and where would you like to pick it up?</h2>
+            <ul id="pickup-date-ul">
+            </ul>
+          </div>
+        </div>
+        <script>
+
+          $("#pickup-when-options-container").on('change', 'input:radio', function() {
+            var val = $(this).next().html();
+            $('#pickup-when-options-container-h2 span').html(val);
+            opcon_show('#pickup-when-options-container-h2');
+            opcon_hide('#pickup-when-options-container');
+            populate_instructions();
+          });
+
+
+        </script>
+      </div>
+
+                <div class="input-div main confirm" style="text-align: center;">
+                  <button id="confirm-btn" onclick="confirm_btn();" type="button" class="btn" style="width: 250px;">Check out</button>
+                </div>
+
+
+      <!-- START GENERAL CART BOTTOM FIELDS -->
+      <div class="grid--full cart__row--table-large">
+        {% comment %}
+        Optional, add a textarea for special notes
+        - Your theme settings can turn this on or off. Default is on.
+        - Make sure you have name="note" for the message to be submitted properly
+        {% endcomment %}
+        {% if settings.cart_notes_enable %}
+        <div class="grid__item large--seven-twelfths no-display">
+          <div class="cart__note">
+            <label for="CartSpecialInstructions">{{ 'cart.general.note' | t }}</label>
+            <textarea name="note" class="input-full" id="CartSpecialInstructions">{{ cart.note }}</textarea>
+          </div>
+        </div>
+        {% endif %}
+        <div class="grid__item large--five-twelfths text-center large--text-right{% unless settings.cart_notes_enable %} push--large--seven-twelfths{% endunless %}">
+          <div class="grid--full cart__row--table no-display">
+            <div class="grid__item one-half large--two-thirds large--text-center">
+              <p class="cart__subtotal">{{ 'cart.general.subtotal' | t }}</p>
+            </div>
+            <div class="grid__item one-half large--one-third">
+              <p class="cart__subtotal">{{ cart.total_price | money }}</p>
+            </div>
+          </div>
+
+          {% if cart.total_discounts > 0 %}
+          {% assign cartTotalDiscounts = cart.total_discounts | money %}
+          <p class="cart__savings">{{ 'cart.general.savings_html' | t: savings: cartTotalDiscounts }}</p>
+          {% endif %}
+          <p class="no-display"><em>{{ 'cart.general.shipping_at_checkout' | t }}</em></p>
+          <button type="submit" id="update-cart-button" name="update" class="btn--secondary update-cart no-display">{{ 'cart.general.update' | t }}</button>
+          <button type="submit" name="checkout" class="btn cart__checkout" style="display:none;">
+            {{ 'cart.general.checkout' | t }} <span class="icon icon-arrow-right" aria-hidden="true"></span>
+          </button>
+
+          {% if additional_checkout_buttons and settings.cart_type != 'drawer' %}
+          <div class="additional_checkout_buttons" style="display:none;">{{ content_for_additional_checkout_buttons }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <!-- END GENERAL CART BOTTOM FIELDS -->
+      <style>
+        h2.option-picked{
+          font-size: 1.2em; 
+          border-bottom: 1px solid #757575;
+        }
+        h2.option-picked:hover{
+          cursor: pointer;
+        }
+        h2.option-picked span{
+          font-weight: 600;
+          padding-left: 10px;
+        }
+      </style>
+      <div class="cart__row">
+
+
+                <script>
+
+
+                  function validate_zip(zip){
+                    //                       var zip = $('#zip-input').val();
+                    if (zip == ''){
+                      return 'none'; 
+                    }
+                    var free = $('#'+zip).attr('free');
+                    if ( free == 'TRUE' ){
+                      return 'free'; 
+                    }
+                    var fee = $('#'+zip).attr('available');
+                    if ( fee == 'TRUE' ){
+                      return 'available'; 
+                    }
+                    else {
+                      return 'unavailable';
+                    }
+                  }
+
+
+
+
+                </script>
+
+      <style>
+
+        span.free{
+          background: none;
+          color: green;
+        }
+        span.free:before {
+          content: "Complimentary delivery";
+        }
+        span.unavailable{
+          background: none;
+          color: red;
+        }
+        span.unavailable:before {
+          content: "No delivery available";
+        }
+        span.available{
+          background: none;
+          color: green;
+        }
+        span.available:before {
+          content: "Delivery available";
+        }
+      </style>
+
+      <!-- SCRIPT START -->
+      <script>
+
+
+        function qty_change(elm){
+          var orig_qty = $(elm).attr('orig-qty');
+          var new_qty = $(elm).val(); 
+          var max_qty = $(elm).attr('max');
+          var item_key = $(elm).attr('item-key').replace(':','\\\:');
+          if (parseFloat(new_qty) >= parseFloat(max_qty) ){
+            $('#inventory-max-message-'+item_key).css('opacity','1');
+            $(elm).val(max_qty);
+          } else if (parseFloat(new_qty) < parseFloat(max_qty) ){
+            $('#inventory-max-message-'+item_key).css('opacity','0');
+          }
+          if ( new_qty !== orig_qty ){
+            document.getElementById('update-cart-button').classList.add("flashing");
+            $('#update-cart-button').css('display','');
+          }
+          if ( new_qty == orig_qty ){
+            document.getElementById('update-cart-button').classList.add("flashing");
+            $('#update-cart-button').css('display','none');
+          }
+        }
+
+
+
+
+        function zip_code_check(zip_input,address_id){
+
+          var out = validate_zip(zip_input);
+          $('#delivery_address_span_'+address_id).attr('class',out)
+          console.log(out);
+        }
+
+
+        function validate_account_zips(){
+          {% if customer %}
+          zip_code_check({{customer.default_address.zip }},{{customer.default_address.id}});
+          $('#'+'delivery_address_label_{{customer.default_address.id}}').click();
+
+            {% for address in customer.addresses %}
+            {% if address.id != customer.default_address.id %}
+            zip_code_check({{address.zip }})
+          zip_code_check({{address.zip }},{{address.id}})
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+        }
+
+
+      </script>
+
+
+
+
+      </div>
+
+
+    </form>
+
+  {% else %}
+  {% comment %}
+  The cart is empty
+  {% endcomment %}
+  <header class="section-header text-center">
+    <h1 class="text-center font-upper">{{ 'cart.general.title' | t }}</h1>
+    <hr class="hr--small">
+    <p class="cart--empty-message">{{ 'cart.general.empty' | t }}</p>
+    <p class="cart--continue-browsing">{{ 'cart.general.continue_browsing_html' | t }}</p>
+    <p class="cookie-message">{{ 'cart.general.cookies_required' | t }}</p>
+  </header>
+
+  {% endif %}
+</div>
+  
+  <script>
+  $("body").on('click', 'button.cart-item-button', function() {
+    console.log('test');
+    $('button.cart-item-button[state="active"]').each(function(index){
+      $(this).attr('state','inactive');
+      var dmethod=$(this).attr('method');
+      $('[dmethod="'+dmethod+'"]').slideUp();
+    });
+    var dmethod=$(this).attr('method');
+
+    if(dmethod=='other'){
+      $('.main-msg').html('');
+      $('.sub-msg').html('Please note, this is only for arrangements made previously with us specifically for this order. Any other uses of this method may result in cancellation of your order');
+      $(this).attr('state','active');
+      $('[dmethod="'+dmethod+'"]').slideDown();
+    }
+    if(dmethod=='delivery'){
+      $(this).attr('state','active');
+      if ($('#address-zip').val()==''){
+        $('.main-msg').html('Let\'s check your ZIP Code first');
+        $('.sub-msg').html('');
+        $('#address-zip-label').slideDown();
+        $('#address-zip').slideDown();
+      }else{
+        $('[dmethod="'+dmethod+'"]').slideDown();
+      }
+    }
+
+  });
+  </script>
+  
+  <div class="grid__item large--two-sixths push--large--one-twelfth">
+    <div class="cart-second-panel">
+      <div class="cart-second-panel-item">
+        <div style="text-align:center;">
+          <div id="zip-table" class="popup-open" pop="zip20-pop">Which zips do we deliver to?</div>
+        </div>
+      </div>
+      <div class="cart-second-panel-item delivery-type">
+        <button method="delivery" class="cart-item-button" state="active">Home Delivery</button>
+        <button method="pickup" style="display:none;" class="cart-item-button">Pick Up</button>
+        <button method="other" class="cart-item-button">Other Arrangements</button>
+      </div>
+      <div class="cart-second-panel-item">
+        <div class="text-center main-msg"></div>
+        <div class="text-center sub-msg"></div>
+        
+
+        <label dmethod="delivery" style="display:none;" id="address-str-label" class="delivery-new-add-label" for="address-str">Street Address
+        </label>
+        <input dmethod="delivery" style="display:none;" id="address-str" type="text">
+
+        <label dmethod="delivery" style="display:none;" id="address-apt-label" class="delivery-new-add-label" for="address-apt">Apt/Suite #
+        </label>
+        <input dmethod="delivery" style="display:none;" id="address-apt" type="text">
+
+        <label dmethod="delivery" style="display:none;" id="address-city-label" class="delivery-new-add-label" for="address-city">City
+        </label>
+        <input dmethod="delivery" style="display:none;" id="address-city" type="text" disabled="true">
+
+        <label dmethod="delivery" style="display:none;" id="address-state-label" class="delivery-new-add-label" for="address-state">State
+        </label>
+        <select dmethod="delivery" style="display:none;" id="address-state" disabled="true">
+          <option id="KS" value="KS">KS</option>
+          <option id="MO" value="MO">MO</option>
+        </select>
+        
+        <label dmethod="delivery" style="display:none;" id="address-zip-label"
+               class="delivery-new-add-label" 
+               for="address-zip"
+               >ZIP
+        </label>
+        <input dmethod="delivery" style="display:none;" class="zip" onkeyup="validate_zip_code(this)" id="address-zip" type="text">
+        
+        <label dmethod="other" style="display:none;" id="other-note-label" class="delivery-new-add-label" for="other-note" style="width: 100%; text-align: left;">Special instructions/requests
+        </label>
+        <textarea dmethod="other" style="display:none;" style="width: 100%;" id="other-note" type="text"></textarea>
+
+        <label dmethod="delivery" style="display:none;" id="delivery-date-label" class="delivery-new-add-label" for="delivery-date">Delivery Date
+        </label>
+        <select dmethod="delivery" style="display:none;" id="delivery-date">
+        </select>
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+{% if cart.item_count > 0 %}
+	{% for item in cart.items %}
+		{% unless item.title contains 'Delivery' %}
+
+{% unless item.requires_shipping %}
+<script>
+  $('#pickup-delivery-options-div').css('display','block');
+  $('#confirm-btn').prop('disabled',true);
+</script>
+{% endunless %}
+
+		{% endunless %}
+
+{% endfor %}
+{% endif %}
+
+
+<!--
+<div id="shopify-section-product-template" class="shopify-section">
+  <div itemscope="" itemtype="http://schema.org/Product" id="ProductSection" data-section-id="product-template" data-section-type="product-template" data-image-zoom-type="true" data-enable-history-state="true">
+    <div itemscope="" itemtype="http://schema.org/Product">
+      <meta itemprop="url" content="https://kccattlecompany.com/products/kansas-city-metro-delivery">
+      <meta itemprop="image" content="//cdn.shopify.com/s/assets/no-image-2048-5e88c1b20e087fb7bbe9a3771824e743c244f437e4f8ba93bbf7b11b53f7824c_grande.gif">
+      <div class="grid product-single">
+        <div class="grid__item product-single__meta--wrapper medium--five-twelfths large--five-twelfths">
+          <div class="product-single__meta">
+            <h1 class="product-single__title" itemprop="name">Kansas City Metro Delivery</h1>
+            <div itemprop="offers" itemscope="" itemtype="http://schema.org/Offer">
+              <span id="PriceA11y" class="visually-hidden">Regular price</span>
+              <span id="ProductPrice" class="product-single__price" itemprop="price" content="20.0">
+                $20.00
+              </span>
+              <hr class="hr--small">
+              <meta itemprop="priceCurrency" content="USD">
+              <link itemprop="availability" href="http://schema.org/InStock">
+              <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-single__form" id="AddToCartForm">
+                <select name="id" id="ProductSelect" class="product-single__variants no-js">
+                  <option selected="selected" data-sku="" value="45327683844">
+                    Default Title - $20.00 USD
+                  </option>
+                </select>
+                <div class="product-single__add-to-cart">
+                  <button type="submit" name="add" id="AddToCart" class="btn">
+                    <span id="AddToCartText">
+                      Add to Cartxx
+                    </span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" id="ProductJson-product-template">
+    {"id":11434418180,"title":"Kansas City Metro Delivery","handle":"kansas-city-metro-delivery","description":"","published_at":"2017-09-03T17:23:27-05:00","created_at":"2017-07-14T10:33:06-05:00","vendor":"KCCattleCo","type":"","tags":[],"price":2000,"price_min":2000,"price_max":2000,"available":true,"price_varies":false,"compare_at_price":null,"compare_at_price_min":0,"compare_at_price_max":0,"compare_at_price_varies":false,"variants":[{"id":45327683844,"title":"Default Title","option1":"Default Title","option2":null,"option3":null,"sku":"","requires_shipping":false,"taxable":false,"featured_image":null,"available":true,"name":"Kansas City Metro Delivery","public_title":null,"options":["Default Title"],"price":2000,"weight":0,"compare_at_price":null,"inventory_quantity":1,"inventory_management":null,"inventory_policy":"deny","barcode":""}],"images":[],"featured_image":null,"options":["Title"],"content":""}
+  </script>
+</div>
+-->
